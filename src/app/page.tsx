@@ -90,6 +90,8 @@ export default function Home() {
         <div className="flex flex-col justify-center space-y-6">
           <PreviewPanel
             data={getQRData() || " "}
+            rawText={getQRData()}
+            inputMode={inputMode}
             foreground={foreground}
             background={background}
             robustness={robustness}
