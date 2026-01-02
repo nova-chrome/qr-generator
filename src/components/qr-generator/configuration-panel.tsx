@@ -1,6 +1,6 @@
 "use client";
 
-import { Link as LinkIcon, Settings2, User, Wifi } from "lucide-react";
+import { Circle, Link as LinkIcon, Settings2, Square, User, Wifi } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -17,6 +17,7 @@ import { TextInputForm } from "./text-input-form";
 import { WifiForm } from "./wifi-form";
 
 export type InputMode = "text" | "contact" | "wifi";
+export type QRStyle = "classic" | "dots";
 
 interface ConfigurationPanelProps {
   inputMode: InputMode;
@@ -27,6 +28,8 @@ interface ConfigurationPanelProps {
   onContactDataChange: (contactData: ContactData) => void;
   wifiData: WifiData;
   onWifiDataChange: (wifiData: WifiData) => void;
+  style: QRStyle;
+  onStyleChange: (style: QRStyle) => void;
   foreground: string;
   onForegroundChange: (color: string) => void;
   background: string;
@@ -44,6 +47,8 @@ export function ConfigurationPanel({
   onContactDataChange,
   wifiData,
   onWifiDataChange,
+  style,
+  onStyleChange,
   foreground,
   onForegroundChange,
   background,
@@ -106,6 +111,35 @@ export function ConfigurationPanel({
         {inputMode === "wifi" && (
           <WifiForm wifiData={wifiData} onWifiDataChange={onWifiDataChange} />
         )}
+
+        <div className="space-y-2">
+          <Label>QR Code Style</Label>
+          <Select
+            value={style}
+            onValueChange={(val: QRStyle) => onStyleChange(val)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select style" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="classic">
+                <div className="flex items-center gap-2">
+                  <Square className="w-4 h-4" />
+                  Classic
+                </div>
+              </SelectItem>
+              <SelectItem value="dots">
+                <div className="flex items-center gap-2">
+                  <Circle className="w-4 h-4" />
+                  Dots
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Choose between classic square modules or sleek circular dots.
+          </p>
+        </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">

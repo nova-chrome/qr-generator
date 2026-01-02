@@ -20,11 +20,14 @@ import {
 import { QRCode } from "~/components/kibo-ui/qr-code";
 import { downloadQRCode } from "~/lib/qr-utils";
 
+export type QRStyle = "classic" | "dots";
+
 interface PreviewPanelProps {
   data: string;
   foreground: string;
   background: string;
   robustness: "L" | "M" | "Q" | "H";
+  style: QRStyle;
   fileFormat: "svg" | "png" | "jpeg";
   onFileFormatChange: (format: "svg" | "png" | "jpeg") => void;
 }
@@ -34,6 +37,7 @@ export function PreviewPanel({
   foreground,
   background,
   robustness,
+  style,
   fileFormat,
   onFileFormatChange,
 }: PreviewPanelProps) {
@@ -58,6 +62,7 @@ export function PreviewPanel({
             foreground={foreground}
             background={background}
             robustness={robustness}
+            style={style}
             className="rounded-lg"
           />
         </div>

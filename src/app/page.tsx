@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   ConfigurationPanel,
   type InputMode,
+  type QRStyle,
 } from "~/components/qr-generator/configuration-panel";
 import { PreviewPanel } from "~/components/qr-generator/preview-panel";
 import {
@@ -38,6 +39,7 @@ export default function Home() {
   const [foreground, setForeground] = useState("#000000");
   const [background, setBackground] = useState("#ffffff");
   const [robustness, setRobustness] = useState<"L" | "M" | "Q" | "H">("M");
+  const [style, setStyle] = useState<QRStyle>("classic");
   const [fileFormat, setFileFormat] = useState<"svg" | "png" | "jpeg">("svg");
 
   const getQRData = (): string => {
@@ -73,6 +75,8 @@ export default function Home() {
             onContactDataChange={setContactData}
             wifiData={wifiData}
             onWifiDataChange={setWifiData}
+            style={style}
+            onStyleChange={setStyle}
             foreground={foreground}
             onForegroundChange={setForeground}
             background={background}
@@ -89,6 +93,7 @@ export default function Home() {
             foreground={foreground}
             background={background}
             robustness={robustness}
+            style={style}
             fileFormat={fileFormat}
             onFileFormatChange={setFileFormat}
           />
