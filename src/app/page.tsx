@@ -27,6 +27,7 @@ export default function Home() {
   const [foreground, setForeground] = useState("#000000");
   const [background, setBackground] = useState("#ffffff");
   const [robustness, setRobustness] = useState<"L" | "M" | "Q" | "H">("M");
+  const [fileFormat, setFileFormat] = useState<"svg" | "png" | "jpeg">("svg");
   const qrRef = useRef<HTMLDivElement>(null);
 
   const handleDownload = () => {
@@ -35,16 +36,47 @@ export default function Home() {
     const svg = qrRef.current.querySelector("svg");
     if (!svg) return;
 
-    const svgData = new XMLSerializer().serializeToString(svg);
-    const blob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
+    if (fileFormat === "svg") {
+      const svgData = new XMLSerializer().serializeToString(svg);
+      const blob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `qrcode.svg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      const svgData = new XMLSerializer().serializeToString(svg);
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      const img = new Image();
+      
+      const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(svgBlob);
 
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "qrcode.svg";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+      img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        if (ctx) {
+            // Fill background for JPEG as it doesn't support transparency
+            if (fileFormat === 'jpeg') {
+                ctx.fillStyle = background;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            ctx.drawImage(img, 0, 0);
+            const imgUrl = canvas.toDataURL(`image/${fileFormat}`);
+            const link = document.createElement("a");
+            link.href = imgUrl;
+            link.download = `qrcode.${fileFormat}`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+      };
+      img.src = url;
+    }
   };
 
   return (
@@ -173,9 +205,19 @@ export default function Home() {
               </div>
             </CardContent>
             <CardFooter className="bg-slate-50/50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800 p-4 gap-2">
+                <Select value={fileFormat} onValueChange={(val: "svg" | "png" | "jpeg") => setFileFormat(val)}>
+                    <SelectTrigger className="w-[100px]">
+                        <SelectValue placeholder="Format" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="svg">SVG</SelectItem>
+                        <SelectItem value="png">PNG</SelectItem>
+                        <SelectItem value="jpeg">JPEG</SelectItem>
+                    </SelectContent>
+                </Select>
               <Button className="flex-1" onClick={handleDownload}>
                 <Download className="w-4 h-4 mr-2" />
-                Download SVG
+                Download {fileFormat.toUpperCase()}
               </Button>
             </CardFooter>
           </Card>
