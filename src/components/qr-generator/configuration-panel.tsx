@@ -1,6 +1,6 @@
 "use client";
 
-import { Link as LinkIcon, Settings2, User } from "lucide-react";
+import { Link as LinkIcon, Settings2, User, Wifi } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -11,11 +11,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import type { ContactData } from "~/lib/qr-utils";
+import type { ContactData, WifiData } from "~/lib/qr-utils";
 import { ContactCardForm } from "./contact-card-form";
 import { TextInputForm } from "./text-input-form";
+import { WifiForm } from "./wifi-form";
 
-export type InputMode = "text" | "contact";
+export type InputMode = "text" | "contact" | "wifi";
 
 interface ConfigurationPanelProps {
   inputMode: InputMode;
@@ -24,6 +25,8 @@ interface ConfigurationPanelProps {
   onDataChange: (data: string) => void;
   contactData: ContactData;
   onContactDataChange: (contactData: ContactData) => void;
+  wifiData: WifiData;
+  onWifiDataChange: (wifiData: WifiData) => void;
   foreground: string;
   onForegroundChange: (color: string) => void;
   background: string;
@@ -39,6 +42,8 @@ export function ConfigurationPanel({
   onDataChange,
   contactData,
   onContactDataChange,
+  wifiData,
+  onWifiDataChange,
   foreground,
   onForegroundChange,
   background,
@@ -77,17 +82,29 @@ export function ConfigurationPanel({
                   Contact Card
                 </div>
               </SelectItem>
+              <SelectItem value="wifi">
+                <div className="flex items-center gap-2">
+                  <Wifi className="w-4 h-4" />
+                  WiFi Network
+                </div>
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-        {inputMode === "text" ? (
+        {inputMode === "text" && (
           <TextInputForm data={data} onDataChange={onDataChange} />
-        ) : (
+        )}
+
+        {inputMode === "contact" && (
           <ContactCardForm
             contactData={contactData}
             onContactDataChange={onContactDataChange}
           />
+        )}
+
+        {inputMode === "wifi" && (
+          <WifiForm wifiData={wifiData} onWifiDataChange={onWifiDataChange} />
         )}
 
         <div className="grid grid-cols-2 gap-4">

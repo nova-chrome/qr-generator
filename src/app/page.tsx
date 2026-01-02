@@ -6,7 +6,12 @@ import {
   type InputMode,
 } from "~/components/qr-generator/configuration-panel";
 import { PreviewPanel } from "~/components/qr-generator/preview-panel";
-import { generateVCard, type ContactData } from "~/lib/qr-utils";
+import {
+  generateVCard,
+  generateWifiQR,
+  type ContactData,
+  type WifiData,
+} from "~/lib/qr-utils";
 
 export default function Home() {
   const [inputMode, setInputMode] = useState<InputMode>("text");
@@ -24,6 +29,12 @@ export default function Home() {
     zipCode: "",
     country: "",
   });
+  const [wifiData, setWifiData] = useState<WifiData>({
+    ssid: "",
+    password: "",
+    security: "WPA2",
+    hidden: false,
+  });
   const [foreground, setForeground] = useState("#000000");
   const [background, setBackground] = useState("#ffffff");
   const [robustness, setRobustness] = useState<"L" | "M" | "Q" | "H">("M");
@@ -32,6 +43,9 @@ export default function Home() {
   const getQRData = (): string => {
     if (inputMode === "contact") {
       return generateVCard(contactData);
+    }
+    if (inputMode === "wifi") {
+      return generateWifiQR(wifiData);
     }
     return data;
   };
@@ -57,6 +71,8 @@ export default function Home() {
             onDataChange={setData}
             contactData={contactData}
             onContactDataChange={setContactData}
+            wifiData={wifiData}
+            onWifiDataChange={setWifiData}
             foreground={foreground}
             onForegroundChange={setForeground}
             background={background}

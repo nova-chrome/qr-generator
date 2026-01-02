@@ -1,5 +1,12 @@
 import type { RefObject } from "react";
 
+export interface WifiData {
+  ssid: string;
+  password: string;
+  security: "WPA" | "WPA2" | "WEP" | "nopass";
+  hidden: boolean;
+}
+
 export interface ContactData {
   firstName: string;
   lastName: string;
@@ -112,4 +119,26 @@ export function downloadQRCode(
     };
     img.src = url;
   }
+}
+
+export function generateWifiQR(wifi: WifiData): string {
+  let wifiString = "WIFI:";
+
+  if (wifi.security !== "nopass") {
+    wifiString += `T:${wifi.security};`;
+  }
+
+  wifiString += `S:${wifi.ssid};`;
+
+  if (wifi.password && wifi.security !== "nopass") {
+    wifiString += `P:${wifi.password};`;
+  }
+
+  if (wifi.hidden) {
+    wifiString += "H:true;";
+  }
+
+  wifiString += ";";
+
+  return wifiString;
 }
