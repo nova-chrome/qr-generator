@@ -41,23 +41,40 @@ export const QRCode = ({
   useEffect(() => {
     const generateQR = async () => {
       try {
-        const styles = getComputedStyle(document.documentElement);
-        const foregroundColor =
-          foreground ?? styles.getPropertyValue("--foreground");
-        const backgroundColor =
-          background ?? styles.getPropertyValue("--background");
+        let darkColor: string;
+        let lightColor: string;
 
-        const foregroundOklch = getOklch(
-          foregroundColor,
-          [0.21, 0.006, 285.885]
-        );
-        const backgroundOklch = getOklch(backgroundColor, [0.985, 0, 0]);
+        // If hex colors are provided directly, use them
+        if (foreground && foreground.startsWith("#")) {
+          darkColor = foreground;
+        } else {
+          // Otherwise, get from CSS variables
+          const styles = getComputedStyle(document.documentElement);
+          const foregroundColor =
+            foreground ?? styles.getPropertyValue("--foreground");
+          const foregroundOklch = getOklch(
+            foregroundColor,
+            [0.21, 0.006, 285.885]
+          );
+          darkColor = formatHex(oklch({ mode: "oklch", ...foregroundOklch }));
+        }
+
+        if (background && background.startsWith("#")) {
+          lightColor = background;
+        } else {
+          // Otherwise, get from CSS variables
+          const styles = getComputedStyle(document.documentElement);
+          const backgroundColor =
+            background ?? styles.getPropertyValue("--background");
+          const backgroundOklch = getOklch(backgroundColor, [0.985, 0, 0]);
+          lightColor = formatHex(oklch({ mode: "oklch", ...backgroundOklch }));
+        }
 
         const newSvg = await QR.toString(data, {
           type: "svg",
           color: {
-            dark: formatHex(oklch({ mode: "oklch", ...foregroundOklch })),
-            light: formatHex(oklch({ mode: "oklch", ...backgroundOklch })),
+            dark: darkColor,
+            light: lightColor,
           },
           width: 200,
           errorCorrectionLevel: robustness,
