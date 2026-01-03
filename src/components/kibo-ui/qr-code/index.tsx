@@ -82,32 +82,55 @@ export const QRCode = ({
         // Generate custom SVG based on style
         const size = qrCode.modules.size;
         const moduleSize = 200 / size;
-        const margin = 0;
 
-        let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${200 + margin * 2} ${200 + margin * 2}" width="${200 + margin * 2}" height="${200 + margin * 2}">`;
+        let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" shape-rendering="crispEdges">`;
 
         // Background
-        svgContent += `<rect width="100%" height="100%" fill="${lightColor}"/>`;
+        svgContent += `<rect x="0" y="0" width="200" height="200" fill="${lightColor}"/>`;
 
         // Draw modules
-        for (let row = 0; row < size; row++) {
-          for (let col = 0; col < size; col++) {
-            if (qrCode.modules.get(row, col)) {
-              const x = col * moduleSize + margin;
-              const y = row * moduleSize + margin;
-
-              if (style === "dots") {
-                // Draw circle for dots style
+        if (style === "dots") {
+          for (let row = 0; row < size; row++) {
+            for (let col = 0; col < size; col++) {
+              if (qrCode.modules.get(row, col)) {
+                const x = col * moduleSize;
+                const y = row * moduleSize;
                 const radius = moduleSize / 2;
                 const cx = x + radius;
                 const cy = y + radius;
                 svgContent += `<circle cx="${cx}" cy="${cy}" r="${radius}" fill="${darkColor}"/>`;
-              } else {
-                // Draw square for classic style
-                svgContent += `<rect x="${x}" y="${y}" width="${moduleSize}" height="${moduleSize}" fill="${darkColor}"/>`;
               }
             }
           }
+        } else {
+          // Classic style - optimized with path merging
+          let pathD = "";
+          for (let row = 0; row < size; row++) {
+            let col = 0;
+            while (col < size) {
+              if (qrCode.modules.get(row, col)) {
+                // Found a module, check for horizontal run
+                let length = 1;
+                while (
+                  col + length < size &&
+                  qrCode.modules.get(row, col + length)
+                ) {
+                  length++;
+                }
+
+                const x = col * moduleSize;
+                const y = row * moduleSize;
+                const w = length * moduleSize;
+                const h = moduleSize;
+
+                pathD += `M${x},${y}h${w}v${h}h-${w}z`;
+                col += length;
+              } else {
+                col++;
+              }
+            }
+          }
+          svgContent += `<path d="${pathD}" fill="${darkColor}"/>`;
         }
 
         svgContent += "</svg>";

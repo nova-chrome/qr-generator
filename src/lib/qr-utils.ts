@@ -69,12 +69,16 @@ export function generateVCard(contact: ContactData): string {
 export function downloadQRCode(
   qrRef: RefObject<HTMLDivElement | null>,
   fileFormat: "svg" | "png" | "jpeg",
-  background: string
+  background: string,
+  fileName: string = "qrcode"
 ) {
   if (!qrRef.current) return;
 
   const svg = qrRef.current.querySelector("svg");
   if (!svg) return;
+
+  // Use provided fileName or default
+  const finalFileName = fileName.trim() || "qrcode";
 
   if (fileFormat === "svg") {
     const svgData = new XMLSerializer().serializeToString(svg);
@@ -82,7 +86,7 @@ export function downloadQRCode(
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `qrcode.svg`;
+    link.download = `${finalFileName}.svg`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -110,7 +114,7 @@ export function downloadQRCode(
         const imgUrl = canvas.toDataURL(`image/${fileFormat}`);
         const link = document.createElement("a");
         link.href = imgUrl;
-        link.download = `qrcode.${fileFormat}`;
+        link.download = `${finalFileName}.${fileFormat}`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

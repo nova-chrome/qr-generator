@@ -11,6 +11,8 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -33,6 +35,8 @@ interface PreviewPanelProps {
   style: QRStyle;
   fileFormat: "svg" | "png" | "jpeg";
   onFileFormatChange: (format: "svg" | "png" | "jpeg") => void;
+  fileName: string;
+  onFileNameChange: (name: string) => void;
 }
 
 export function PreviewPanel({
@@ -45,12 +49,14 @@ export function PreviewPanel({
   style,
   fileFormat,
   onFileFormatChange,
+  fileName,
+  onFileNameChange,
 }: PreviewPanelProps) {
   const qrRef = useRef<HTMLDivElement>(null);
   const [showTextPreview, setShowTextPreview] = useState(false);
 
   const handleDownload = () => {
-    downloadQRCode(qrRef, fileFormat, background);
+    downloadQRCode(qrRef, fileFormat, background, fileName);
   };
 
   const shouldShowTextPreview = inputMode === "contact" || inputMode === "wifi";
@@ -97,26 +103,42 @@ export function PreviewPanel({
           </div>
         )}
       </CardContent>
-      <CardFooter className="bg-slate-50/50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800 p-4 gap-2">
-        <Select
-          value={fileFormat}
-          onValueChange={(val: "svg" | "png" | "jpeg") =>
-            onFileFormatChange(val)
-          }
-        >
-          <SelectTrigger className="w-[100px]">
-            <SelectValue placeholder="Format" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="svg">SVG</SelectItem>
-            <SelectItem value="png">PNG</SelectItem>
-            <SelectItem value="jpeg">JPEG</SelectItem>
-          </SelectContent>
-        </Select>
-        <Button className="flex-1" onClick={handleDownload}>
-          <Download className="w-4 h-4 mr-2" />
-          Download {fileFormat.toUpperCase()}
-        </Button>
+      <CardFooter className="bg-slate-50/50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800 p-4 gap-2 flex-col">
+        <div className="w-full space-y-2">
+          <Label htmlFor="fileName">File Name</Label>
+          <Input
+            id="fileName"
+            type="text"
+            value={fileName}
+            onChange={(e) => onFileNameChange(e.target.value)}
+            placeholder="qrcode"
+            className="font-mono"
+          />
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Defaults to "qrcode" if left empty
+          </p>
+        </div>
+        <div className="w-full flex gap-2">
+          <Select
+            value={fileFormat}
+            onValueChange={(val: "svg" | "png" | "jpeg") =>
+              onFileFormatChange(val)
+            }
+          >
+            <SelectTrigger className="w-[100px]">
+              <SelectValue placeholder="Format" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="svg">SVG</SelectItem>
+              <SelectItem value="png">PNG</SelectItem>
+              <SelectItem value="jpeg">JPEG</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button className="flex-1" onClick={handleDownload}>
+            <Download className="w-4 h-4 mr-2" />
+            Download {fileFormat.toUpperCase()}
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   );

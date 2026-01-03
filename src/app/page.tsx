@@ -41,6 +41,7 @@ export default function Home() {
   const [robustness, setRobustness] = useState<"L" | "M" | "Q" | "H">("M");
   const [style, setStyle] = useState<QRStyle>("classic");
   const [fileFormat, setFileFormat] = useState<"svg" | "png" | "jpeg">("svg");
+  const [fileName, setFileName] = useState("qrcode");
 
   const getQRData = (): string => {
     if (inputMode === "contact") {
@@ -98,6 +99,8 @@ export default function Home() {
             style={style}
             fileFormat={fileFormat}
             onFileFormatChange={setFileFormat}
+            fileName={fileName}
+            onFileNameChange={setFileName}
           />
         </div>
       </div>
